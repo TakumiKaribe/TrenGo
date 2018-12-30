@@ -54,45 +54,70 @@ func main() {
 	languages := []string{}
 	stars := []string{}
 	forks := []string{}
-	_ = languages
-	_ = stars
-	_ = forks
+	for i := 0; i < len(titles); i++ {
+		languages = append(languages, "NOT EXIST")
+		stars = append(stars, "NOT EXIST")
+		forks = append(forks, "NOT EXIST")
+	}
+
 	trends.Find("div.f6.text-gray.mt-2").Each(func(i int, s *goquery.Selection) {
 		// repセルの横並び属性が25件
 		s.Children().Each(func(j int, ns *goquery.Selection) {
 			// 横並び属性を（最大）5分割したもの
-			if j == 0 {
-				lang := strings.TrimSpace(ns.Children().Last().Text())
-				if lang != "" {
-					languages = append(languages, lang)
-				} else {
-					languages = append(languages, "NOT EXIST")
+			first := ns.First()
+			{
+				attr, _ := first.Children().Attr("class")
+				text := strings.TrimSpace(ns.Children().Last().Text())
+				if attr == "repo-language-color ml-0" && text != "" {
+					languages[i] = text
+				} else if attr == "oction oction-star" && text != "" {
+					stars[i] = text
+				} else if attr == "oction oction-fork" && text != "" {
+					forks[i] = text
 				}
+				fmt.Printf("%d/%d: %s\n", i, j, text)
 			}
 
-			// value := ns.AttrOr("aria-label", "not exist")
-			// if value == "star" {
-			// 	stars = append(stars, strings.TrimSpace(ns.Children().Text()))
-			// } else if value == "fork" {
-			// 	stars = append(stars, strings.TrimSpace(ns.Children().Text()))
-			// }
+			second := first.Next()
+			{
+				attr, _ := second.Children().Attr("class")
+				text := strings.TrimSpace(ns.Children().Last().Text())
+				if attr == "repo-language-color ml-0" && text != "" {
+					languages[i] = text
+				} else if attr == "oction oction-star" && text != "" {
+					stars[i] = text
+				} else if attr == "oction oction-fork" && text != "" {
+					forks[i] = text
+				}
+				fmt.Printf("%d/%d: %s\n", i, j, text)
+			}
+
+			third := second.Next()
+			{
+				attr, _ := third.Children().Attr("class")
+				text := strings.TrimSpace(ns.Children().Last().Text())
+				if attr == "repo-language-color ml-0" && text != "" {
+					languages[i] = text
+				} else if attr == "oction oction-star" && text != "" {
+					stars[i] = text
+				} else if attr == "oction oction-fork" && text != "" {
+					forks[i] = text
+				}
+				fmt.Printf("%d/%d: %s\n", i, j, text)
+			}
 		})
 	})
 
-	// divf6 := child.Find("div.f6.text-gray.mt-2")
+	today := parse(trends.Find("div.f6.text-gray.mt-2"), "span.d-inline-block.float-sm-right", true)
 
-	// languages := parse(divf6, "span:nth-child(1)", true)
-	// stars := parse(divf6, "a:nth-child(2)", true)
-	// forks := parse(divf6, "a:nth-child(3)", true)
-	// today := parse(divf6, "span.d-inline-block.float-sm-right", true)
 	for i := 0; i < len(titles); i++ {
 		fmt.Print("\n------------------------------\n")
 		fmt.Printf("[Title] %s\n", titles[i])
 		fmt.Printf("[Description] %s\n", descriptions[i])
 		fmt.Printf("[Language] %s\n", languages[i])
-		// fmt.Printf("[Stars] %s\n", stars[i])
-		// fmt.Printf("[Forks] %s\n", forks[i])
-		// fmt.Print(today[i])
-		// fmt.Print("\n")
+		fmt.Printf("[Stars] %s\n", stars[i])
+		fmt.Printf("[Forks] %s\n", forks[i])
+		fmt.Print(today[i])
+		fmt.Print("\n")
 	}
 }
