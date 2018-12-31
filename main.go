@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -80,12 +81,12 @@ func main() {
 	})
 
 	languages := []string{}
-	stars := []string{}
-	forks := []string{}
+	stars := []int{}
+	forks := []int{}
 	for i := 0; i < len(titles); i++ {
 		languages = append(languages, "NOT EXIST")
-		stars = append(stars, "NOT EXIST")
-		forks = append(forks, "NOT EXIST")
+		stars = append(stars, 0)
+		forks = append(forks, 0)
 	}
 
 	trends.Find("div.f6.text-gray.mt-2").Each(func(i int, s *goquery.Selection) {
@@ -96,10 +97,16 @@ func main() {
 				languages[i] = text
 			} else if attr == "octicon octicon-star" && text != "" {
 				if strings.TrimSpace(ns.Children().AttrOr("aria-label", "default")) == "star" {
-					stars[i] = text
+					v, err := strconv.Atoi(strings.Replace(text, ",", "", -1))
+					if err == nil {
+						stars[i] = v
+					}
 				}
 			} else if attr == "octicon octicon-repo-forked" && text != "" {
-				forks[i] = text
+				v, err := strconv.Atoi(strings.Replace(text, ",", "", -1))
+				if err == nil {
+					forks[i] = v
+				}
 			}
 		})
 	})
@@ -115,15 +122,16 @@ func main() {
 		}
 	})
 
+	fmt.Println("[")
 	for i := 0; i < len(titles); i++ {
 		fmt.Println("{")
-		fmt.Printf("    title: %s,\n", titles[i])
-		fmt.Printf("    url: %s,\n", githubURL+URLs[i])
-		fmt.Printf("    description: %s,\n", descriptions[i])
-		fmt.Printf("    language: %s,\n", languages[i])
-		fmt.Printf("    sumStars: %s,\n", stars[i])
-		fmt.Printf("    forks: %s,\n", forks[i])
-		fmt.Printf("    stars: %s\n", today[i])
+		fmt.Printf("    title: %s,\n", "\""+titles[i]+"\"")
+		fmt.Printf("    url: %s,\n", "\""+githubURL+URLs[i]+"\"")
+		fmt.Printf("    description: %s,\n", "\""+descriptions[i]+"\"")
+		fmt.Printf("    language: %s,\n", "\""+languages[i]+"\"")
+		fmt.Printf("    sumStars: %d,\n", stars[i])
+		fmt.Printf("    forks: %d,\n", forks[i])
+		fmt.Printf("    stars: %s\n", "\""+today[i]+"\"")
 		fmt.Print("}")
 		if i < len(titles)-1 {
 			fmt.Print(",\n")
@@ -131,4 +139,5 @@ func main() {
 			fmt.Println()
 		}
 	}
+	fmt.Println("]")
 }
