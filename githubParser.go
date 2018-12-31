@@ -13,7 +13,8 @@ import (
 var lang string
 var rangeType RangeType
 
-var titles [50]string
+var developers [50]string
+var names [50]string
 var URLs [50]string
 var descriptions [50]string
 var languages [50]string
@@ -43,7 +44,9 @@ func parseGitHub() {
 
 	trends.Each(func(i int, s *goquery.Selection) {
 		s.Find("div.d-inline-block.col-9.mb-1 > h3 > a").Each(func(i int, s *goquery.Selection) {
-			titles[i] = strings.TrimSpace(s.Text())
+			text := strings.Split(strings.Replace(s.Text(), " ", "", -1), "/")
+			developers[i] = strings.TrimSpace(text[0])
+			names[i] = strings.TrimSpace(text[1])
 			URLs[i] = strings.TrimSpace(s.AttrOr("href", "default"))
 		})
 		s.Find("div.py-1").Each(func(i int, s *goquery.Selection) {
@@ -91,26 +94,45 @@ func parseGitHub() {
 	length = divf6.Length()
 }
 
-func printGitHub() {
-	fmt.Println("[")
-	for i := 0; i < length; i++ {
-		fmt.Println("{")
-		fmt.Printf("    title: %s,\n", "\""+titles[i]+"\"")
-		fmt.Printf("    url: %s,\n", "\""+githubURL+URLs[i]+"\"")
-		fmt.Printf("    description: %s,\n", "\""+descriptions[i]+"\"")
-		fmt.Printf("    language: %s,\n", "\""+languages[i]+"\"")
-		fmt.Printf("    sumStars: %d,\n", stars[i])
-		fmt.Printf("    forks: %d,\n", forks[i])
-		fmt.Printf("    ranged: {\n")
-		fmt.Printf("        type: %s,\n", "\""+rangeType.QueryString()+"\"")
-		fmt.Printf("        stars: %d\n", rangeStar[i])
-		fmt.Printf("    }\n")
-		fmt.Print("}")
-		if i < length-1 {
-			fmt.Print(",\n")
-		} else {
+func printGitHub(json bool) {
+	if json {
+		fmt.Println("[")
+		for i := 0; i < length; i++ {
+			fmt.Println("{")
+			fmt.Printf("  developer: %s,\n", "\""+developers[i]+"\"")
+			fmt.Printf("  name: %s,\n", "\""+names[i]+"\"")
+			fmt.Printf("  url: %s,\n", "\""+githubURL+URLs[i]+"\"")
+			fmt.Printf("  description: %s,\n", "\""+descriptions[i]+"\"")
+			fmt.Printf("  language: %s,\n", "\""+languages[i]+"\"")
+			fmt.Printf("  sumStars: %d,\n", stars[i])
+			fmt.Printf("  forks: %d,\n", forks[i])
+			fmt.Printf("  ranged: {\n")
+			fmt.Printf("    type: %s,\n", "\""+rangeType.QueryString()+"\"")
+			fmt.Printf("    stars: %d\n", rangeStar[i])
+			fmt.Printf("  }\n")
+			fmt.Print("}")
+			if i < length-1 {
+				fmt.Print(",\n")
+			} else {
+				fmt.Println()
+			}
+		}
+		fmt.Println("]")
+
+	} else {
+		fmt.Printf("========== GitHub Trending ==========\n\n")
+		for i := 0; i < length; i++ {
+			fmt.Println("★-----★-----★-----★-----★-----★-----★-----★-----★-----★-----★")
+			fmt.Printf("  [rank] %d\n", i+1)
+			fmt.Printf("  [developer] %s\n", developers[i])
+			fmt.Printf("  [name] %s\n", names[i])
+			fmt.Printf("  [url] %s\n", githubURL+URLs[i])
+			fmt.Printf("  [description] %s\n", descriptions[i])
+			fmt.Printf("  [language] %s\n", languages[i])
+			fmt.Printf("  [sumStars] %d\n", stars[i])
+			fmt.Printf("  [forks] %d\n", forks[i])
+			fmt.Printf("  [trend] %d stars %s\n", rangeStar[i], rangeType.QueryString())
 			fmt.Println()
 		}
 	}
-	fmt.Println("]")
 }
