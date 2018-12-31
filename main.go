@@ -13,18 +13,18 @@ import (
 type RangeType int
 
 const (
-	today RangeType = iota
-	thisWeek
-	thisMonth
+	daily RangeType = iota
+	weekly
+	monthly
 )
 
 func (rt RangeType) String() string {
 	switch rt {
-	case today:
+	case daily:
 		return "daily"
-	case thisWeek:
+	case weekly:
 		return "weekly"
-	case thisMonth:
+	case monthly:
 		return "monthly"
 	default:
 		return "unknown"
@@ -48,16 +48,43 @@ func parse(sel *goquery.Selection, query string, isNested bool) []string {
 
 const trendURL string = "https://github.com/trending"
 
+func parseRangeType(d bool, w bool, m bool) RangeType {
+	if d {
+		return daily
+	}
+
+	if w {
+		return weekly
+	}
+
+	if m {
+		return monthly
+	}
+
+	return daily
+}
+
 func main() {
-	var lang string
+	var (
+		lang string
+		d    bool
+		w    bool
+		m    bool
+	)
 	flag.StringVar(&lang, "l", "", "string flag")
+	flag.BoolVar(&d, "d", false, "daily search")
+	flag.BoolVar(&w, "w", false, "weekly search")
+	flag.BoolVar(&m, "m", false, "monthly search")
+
 	flag.Parse()
 	if lang != "" {
 		lang = "/" + lang
 	}
 
+	rangeType := parseRangeType(d, w, m)
+
 	// Request the HTML page.
-	res, err := http.Get(trendURL + lang + "?since=" + thisWeek.String())
+	res, err := http.Get(trendURL + lang + "?since=" + rangeType.String())
 	if err != nil {
 		log.Fatal(err)
 	}
