@@ -10,28 +10,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-type RangeType int
-
-const (
-	daily RangeType = iota
-	weekly
-	monthly
-)
-
-// TODO: 定義は別ファイルに切り出したい
-func (rt RangeType) String() string {
-	switch rt {
-	case daily:
-		return "daily"
-	case weekly:
-		return "weekly"
-	case monthly:
-		return "monthly"
-	default:
-		return "unknown"
-	}
-}
-
 func parse(sel *goquery.Selection, query string, isNested bool) []string {
 	ret := []string{}
 	if isNested {
@@ -48,25 +26,6 @@ func parse(sel *goquery.Selection, query string, isNested bool) []string {
 }
 
 const trendURL string = "https://github.com/trending"
-
-// TODO: 排他的なオプションにする
-// e.g.) main.go -d -w -m  => error
-// e.g.) main.go -w  => weekly
-func parseRangeType(d bool, w bool, m bool) RangeType {
-	if d {
-		return daily
-	}
-
-	if w {
-		return weekly
-	}
-
-	if m {
-		return monthly
-	}
-
-	return daily
-}
 
 func main() {
 	var (
