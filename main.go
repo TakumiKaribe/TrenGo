@@ -25,7 +25,8 @@ func parse(sel *goquery.Selection, query string, isNested bool) []string {
 	return ret
 }
 
-const trendURL string = "https://github.com/trending"
+const githubURL string = "https://github.com"
+const trending string = "/trending"
 
 func main() {
 	var (
@@ -47,7 +48,7 @@ func main() {
 	rangeType := parseRangeType(d, w, m)
 
 	// Request the HTML page.
-	res, err := http.Get(trendURL + lang + "?since=" + rangeType.String())
+	res, err := http.Get(githubURL + trending + lang + "?since=" + rangeType.String())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,10 +67,17 @@ func main() {
 	trends := doc.Find("body > div.application-main > div.explore-pjax-container.container-lg.p-responsive.clearfix > div > div.col-md-9.float-md-left > div.explore-content > ol")
 
 	titles := []string{}
+	URLs := []string{}
+	_ = URLs
 	descriptions := []string{}
 	trends.Each(func(i int, s *goquery.Selection) {
-		titles = parse(s, "div.d-inline-block.col-9.mb-1 > h3 > a", false)
-		descriptions = parse(s, "div.py-1", false)
+		s.Find("div.d-inline-block.col-9.mb-1 > h3 > a").Each(func(i int, s *goquery.Selection) {
+			titles = append(titles, strings.TrimSpace(s.Text()))
+			URLs = append(URLs, strings.TrimSpace(s.AttrOr("href", "default")))
+		})
+		s.Find("div.py-1").Each(func(i int, s *goquery.Selection) {
+			descriptions = append(descriptions, strings.TrimSpace(s.Text()))
+		})
 	})
 
 	languages := []string{}
@@ -97,11 +105,16 @@ func main() {
 		})
 	})
 
-	today := parse(trends.Find("div.f6.text-gray.mt-2"), "span.d-inline-block.float-sm-right", true)
+	today := []string{}
+	trends.Find("div.f6.text-gray.mt-2").Each(func(i int, s *goquery.Selection) {
+		ns := s.Find("span.d-inline-block.float-sm-right")
+		today = append(today, strings.TrimSpace(ns.Text()))
+	})
 
 	for i := 0; i < len(titles); i++ {
 		fmt.Println("{")
 		fmt.Printf("    title: %s,\n", titles[i])
+		fmt.Printf("    url: %s,\n", githubURL+URLs[i])
 		fmt.Printf("    description: %s,\n", descriptions[i])
 		fmt.Printf("    language: %s,\n", languages[i])
 		fmt.Printf("    sumStars: %s,\n", stars[i])
