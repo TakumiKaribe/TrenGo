@@ -48,7 +48,7 @@ func main() {
 	rangeType := parseRangeType(d, w, m)
 
 	// Request the HTML page.
-	res, err := http.Get(githubURL + trending + lang + "?since=" + rangeType.String())
+	res, err := http.Get(githubURL + trending + lang + "?since=" + rangeType.QueryString())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -107,7 +107,12 @@ func main() {
 	today := []string{}
 	trends.Find("div.f6.text-gray.mt-2").Each(func(i int, s *goquery.Selection) {
 		ns := s.Find("span.d-inline-block.float-sm-right")
-		today = append(today, strings.TrimSpace(ns.Text()))
+		text := strings.TrimSpace(ns.Text())
+		if text != "" {
+			today = append(today, text)
+		} else {
+			today = append(today, "0 stars "+rangeType.DisplayString())
+		}
 	})
 
 	for i := 0; i < len(titles); i++ {

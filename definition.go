@@ -8,7 +8,7 @@ const (
 	monthly
 )
 
-func (rt RangeType) String() string {
+func (rt RangeType) QueryString() string {
 	switch rt {
 	case daily:
 		return "daily"
@@ -16,6 +16,19 @@ func (rt RangeType) String() string {
 		return "weekly"
 	case monthly:
 		return "monthly"
+	default:
+		return "unknown"
+	}
+}
+
+func (rt RangeType) DisplayString() string {
+	switch rt {
+	case daily:
+		return "today"
+	case weekly:
+		return "this week"
+	case monthly:
+		return "this month"
 	default:
 		return "unknown"
 	}
