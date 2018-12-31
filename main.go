@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -48,8 +49,15 @@ func parse(sel *goquery.Selection, query string, isNested bool) []string {
 const trendURL string = "https://github.com/trending"
 
 func main() {
+	var lang string
+	flag.StringVar(&lang, "l", "", "string flag")
+	flag.Parse()
+	if lang != "" {
+		lang = "/" + lang
+	}
+
 	// Request the HTML page.
-	res, err := http.Get(trendURL + "?since=" + thisWeek.String())
+	res, err := http.Get(trendURL + lang + "?since=" + thisWeek.String())
 	if err != nil {
 		log.Fatal(err)
 	}
