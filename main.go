@@ -32,20 +32,27 @@ func main() {
 		w    bool
 		m    bool
 		j    bool
+		g    bool
+		q    bool
 	)
-	flag.StringVar(&lang, "l", "", "string flag")
+	flag.StringVar(&lang, "l", "", "language name")
 	flag.BoolVar(&d, "d", false, "daily search")
 	flag.BoolVar(&w, "w", false, "weekly search")
 	flag.BoolVar(&m, "m", false, "monthly search")
-	flag.BoolVar(&j, "j", false, "monthly search")
+	flag.BoolVar(&g, "g", true, "GitHub search")
+	flag.BoolVar(&q, "q", true, "Qiita search")
+	flag.BoolVar(&j, "j", false, "json format")
 
 	flag.Parse()
+
 	if lang != "" {
 		lang = "/" + lang
 	}
 
 	rangeType = parseRangeType(d, w, m)
 
-	parseGitHub()
-	printGitHub(j)
+	if g {
+		parseGitHub()
+		printGitHub(j)
+	}
 }
