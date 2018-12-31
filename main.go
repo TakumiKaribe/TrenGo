@@ -100,13 +100,18 @@ func main() {
 	today := parse(trends.Find("div.f6.text-gray.mt-2"), "span.d-inline-block.float-sm-right", true)
 
 	for i := 0; i < len(titles); i++ {
-		fmt.Print("\n------------------------------\n")
-		fmt.Printf("[Title] %s\n", titles[i])
-		fmt.Printf("[Description] %s\n", descriptions[i])
-		fmt.Printf("[Language] %s\n", languages[i])
-		fmt.Printf("[Stars] %s\n", stars[i])
-		fmt.Printf("[Forks] %s\n", forks[i])
-		fmt.Print(today[i])
-		fmt.Print("\n")
+		fmt.Println("{")
+		fmt.Printf("    title: %s,\n", titles[i])
+		fmt.Printf("    description: %s,\n", descriptions[i])
+		fmt.Printf("    language: %s,\n", languages[i])
+		fmt.Printf("    sumStars: %s,\n", stars[i])
+		fmt.Printf("    forks: %s,\n", forks[i])
+		fmt.Printf("    stars: %s\n", today[i])
+		fmt.Print("}")
+		if i < len(titles)-1 {
+			fmt.Print(",\n")
+		} else {
+			fmt.Println()
+		}
 	}
 }
