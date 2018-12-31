@@ -18,6 +18,7 @@ const (
 	monthly
 )
 
+// TODO: 定義は別ファイルに切り出したい
 func (rt RangeType) String() string {
 	switch rt {
 	case daily:
@@ -48,6 +49,9 @@ func parse(sel *goquery.Selection, query string, isNested bool) []string {
 
 const trendURL string = "https://github.com/trending"
 
+// TODO: 排他的なオプションにする
+// e.g.) main.go -d -w -m  => error
+// e.g.) main.go -w  => weekly
 func parseRangeType(d bool, w bool, m bool) RangeType {
 	if d {
 		return daily
@@ -99,7 +103,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Find the review items
+	// TODO: parse周りは別ファイルに切り出したい
 	trends := doc.Find("body > div.application-main > div.explore-pjax-container.container-lg.p-responsive.clearfix > div > div.col-md-9.float-md-left > div.explore-content > ol")
 
 	titles := []string{}
