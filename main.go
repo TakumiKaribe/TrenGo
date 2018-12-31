@@ -68,7 +68,6 @@ func main() {
 
 	titles := []string{}
 	URLs := []string{}
-	_ = URLs
 	descriptions := []string{}
 	trends.Each(func(i int, s *goquery.Selection) {
 		s.Find("div.d-inline-block.col-9.mb-1 > h3 > a").Each(func(i int, s *goquery.Selection) {
