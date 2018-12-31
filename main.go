@@ -111,14 +111,18 @@ func main() {
 		})
 	})
 
-	today := []string{}
+	rangeStar := []int{}
 	trends.Find("div.f6.text-gray.mt-2").Each(func(i int, s *goquery.Selection) {
 		ns := s.Find("span.d-inline-block.float-sm-right")
 		text := strings.TrimSpace(ns.Text())
-		if text != "" {
-			today = append(today, text)
+		if text == "" {
+			rangeStar = append(rangeStar, 0)
 		} else {
-			today = append(today, "0 stars "+rangeType.DisplayString())
+			splited := strings.Split(text, " ")
+			star, err := strconv.Atoi(splited[0])
+			if err == nil {
+				rangeStar = append(rangeStar, star)
+			}
 		}
 	})
 
@@ -131,7 +135,10 @@ func main() {
 		fmt.Printf("    language: %s,\n", "\""+languages[i]+"\"")
 		fmt.Printf("    sumStars: %d,\n", stars[i])
 		fmt.Printf("    forks: %d,\n", forks[i])
-		fmt.Printf("    stars: %s\n", "\""+today[i]+"\"")
+		fmt.Printf("    ranged: {\n")
+		fmt.Printf("        type: %s,\n", "\""+rangeType.QueryString()+"\"")
+		fmt.Printf("        stars: %d\n", rangeStar[i])
+		fmt.Printf("    }\n")
 		fmt.Print("}")
 		if i < len(titles)-1 {
 			fmt.Print(",\n")
