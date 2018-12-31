@@ -9,6 +9,27 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+type RangeType int
+
+const (
+	today RangeType = iota
+	thisWeek
+	thisMonth
+)
+
+func (rt RangeType) String() string {
+	switch rt {
+	case today:
+		return "daily"
+	case thisWeek:
+		return "weekly"
+	case thisMonth:
+		return "monthly"
+	default:
+		return "unknown"
+	}
+}
+
 func parse(sel *goquery.Selection, query string, isNested bool) []string {
 	ret := []string{}
 	if isNested {
@@ -24,9 +45,11 @@ func parse(sel *goquery.Selection, query string, isNested bool) []string {
 	return ret
 }
 
+const trendURL string = "https://github.com/trending"
+
 func main() {
 	// Request the HTML page.
-	res, err := http.Get("https://github.com/trending")
+	res, err := http.Get(trendURL + "?since=" + thisWeek.String())
 	if err != nil {
 		log.Fatal(err)
 	}
