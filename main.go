@@ -29,6 +29,14 @@ func parse(sel *goquery.Selection, query string, isNested bool) []string {
 const githubURL string = "https://github.com"
 const trending string = "/trending"
 
+var titles [50]string
+var URLs [50]string
+var descriptions [50]string
+var languages [50]string
+var stars [50]int
+var forks [50]int
+var rangeStar [50]int
+
 func main() {
 	var (
 		lang string
@@ -67,29 +75,18 @@ func main() {
 	// TODO: parse周りは別ファイルに切り出したい
 	trends := doc.Find("body > div.application-main > div.explore-pjax-container.container-lg.p-responsive.clearfix > div > div.col-md-9.float-md-left > div.explore-content > ol")
 
-	titles := []string{}
-	URLs := []string{}
-	descriptions := []string{}
 	trends.Each(func(i int, s *goquery.Selection) {
 		s.Find("div.d-inline-block.col-9.mb-1 > h3 > a").Each(func(i int, s *goquery.Selection) {
-			titles = append(titles, strings.TrimSpace(s.Text()))
-			URLs = append(URLs, strings.TrimSpace(s.AttrOr("href", "default")))
+			titles[i] = strings.TrimSpace(s.Text())
+			URLs[i] = strings.TrimSpace(s.AttrOr("href", "default"))
 		})
 		s.Find("div.py-1").Each(func(i int, s *goquery.Selection) {
-			descriptions = append(descriptions, strings.TrimSpace(s.Text()))
+			descriptions[i] = strings.TrimSpace(s.Text())
 		})
 	})
 
-	languages := []string{}
-	stars := []int{}
-	forks := []int{}
-	for i := 0; i < len(titles); i++ {
-		languages = append(languages, "NOT EXIST")
-		stars = append(stars, 0)
-		forks = append(forks, 0)
-	}
-
-	trends.Find("div.f6.text-gray.mt-2").Each(func(i int, s *goquery.Selection) {
+	divf6 := trends.Find("div.f6.text-gray.mt-2")
+	divf6.Each(func(i int, s *goquery.Selection) {
 		s.Children().Each(func(j int, ns *goquery.Selection) {
 			text := strings.TrimSpace(ns.Text())
 			attr := strings.TrimSpace(ns.Children().AttrOr("class", "default"))
@@ -111,23 +108,22 @@ func main() {
 		})
 	})
 
-	rangeStar := []int{}
-	trends.Find("div.f6.text-gray.mt-2").Each(func(i int, s *goquery.Selection) {
+	divf6.Each(func(i int, s *goquery.Selection) {
 		ns := s.Find("span.d-inline-block.float-sm-right")
 		text := strings.TrimSpace(ns.Text())
 		if text == "" {
-			rangeStar = append(rangeStar, 0)
+			rangeStar[i] = 0
 		} else {
 			splited := strings.Split(text, " ")
 			star, err := strconv.Atoi(splited[0])
 			if err == nil {
-				rangeStar = append(rangeStar, star)
+				rangeStar[i] = star
 			}
 		}
 	})
 
 	fmt.Println("[")
-	for i := 0; i < len(titles); i++ {
+	for i := 0; i < divf6.Length(); i++ {
 		fmt.Println("{")
 		fmt.Printf("    title: %s,\n", "\""+titles[i]+"\"")
 		fmt.Printf("    url: %s,\n", "\""+githubURL+URLs[i]+"\"")
