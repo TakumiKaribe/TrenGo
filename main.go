@@ -61,49 +61,17 @@ func main() {
 	}
 
 	trends.Find("div.f6.text-gray.mt-2").Each(func(i int, s *goquery.Selection) {
-		// repセルの横並び属性が25件
 		s.Children().Each(func(j int, ns *goquery.Selection) {
-			// 横並び属性を（最大）5分割したもの
-			first := ns.First()
-			{
-				attr, _ := first.Children().Attr("class")
-				text := strings.TrimSpace(ns.Children().Last().Text())
-				if attr == "repo-language-color ml-0" && text != "" {
-					languages[i] = text
-				} else if attr == "oction oction-star" && text != "" {
+			text := strings.TrimSpace(ns.Text())
+			attr := strings.TrimSpace(ns.Children().AttrOr("class", "default"))
+			if attr == "repo-language-color ml-0" && text != "" {
+				languages[i] = text
+			} else if attr == "octicon octicon-star" && text != "" {
+				if strings.TrimSpace(ns.Children().AttrOr("aria-label", "default")) == "star" {
 					stars[i] = text
-				} else if attr == "oction oction-fork" && text != "" {
-					forks[i] = text
 				}
-				fmt.Printf("%d/%d: %s\n", i, j, text)
-			}
-
-			second := first.Next()
-			{
-				attr, _ := second.Children().Attr("class")
-				text := strings.TrimSpace(ns.Children().Last().Text())
-				if attr == "repo-language-color ml-0" && text != "" {
-					languages[i] = text
-				} else if attr == "oction oction-star" && text != "" {
-					stars[i] = text
-				} else if attr == "oction oction-fork" && text != "" {
-					forks[i] = text
-				}
-				fmt.Printf("%d/%d: %s\n", i, j, text)
-			}
-
-			third := second.Next()
-			{
-				attr, _ := third.Children().Attr("class")
-				text := strings.TrimSpace(ns.Children().Last().Text())
-				if attr == "repo-language-color ml-0" && text != "" {
-					languages[i] = text
-				} else if attr == "oction oction-star" && text != "" {
-					stars[i] = text
-				} else if attr == "oction oction-fork" && text != "" {
-					forks[i] = text
-				}
-				fmt.Printf("%d/%d: %s\n", i, j, text)
+			} else if attr == "octicon octicon-repo-forked" && text != "" {
+				forks[i] = text
 			}
 		})
 	})
