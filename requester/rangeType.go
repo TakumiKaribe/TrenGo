@@ -1,4 +1,4 @@
-package RangeType
+package requester
 
 type RangeType int
 

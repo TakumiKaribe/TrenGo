@@ -1,4 +1,4 @@
-package GitHubParser
+package requester
 
 import (
 	"fmt"
@@ -8,16 +8,16 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/maka-nai/trengo/Definition"
-	"github.com/maka-nai/trengo/RangeType"
 )
 
-func ParseGitHub(rt RangeType.RangeType, lang string) GitHubResponse {
-	if lang != "" {
-		lang = "/" + lang
-	}
+const githubURL string = "https://github.com"
+const trending string = "trending"
+
+func ParseGitHub(rt RangeType, lang string) GitHubResponse {
+	url := makeURL([]string{githubURL, trending, lang}, []string{"since=" + rt.QueryString()})
+
 	// Request the HTML page.
-	res, err := http.Get(Definition.GithubURL + Definition.Trending + lang + "?since=" + rt.QueryString())
+	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,11 +75,12 @@ func ParseGitHub(rt RangeType.RangeType, lang string) GitHubResponse {
 	divf6.Each(func(i int, s *goquery.Selection) {
 		ns := s.Find("span.d-inline-block.float-sm-right")
 		text := strings.TrimSpace(ns.Text())
+		fmt.Println(text)
 		if text == "" {
 			response.rangeStar[i] = 0
 		} else {
 			splited := strings.Split(text, " ")
-			star, err := strconv.Atoi(splited[0])
+			star, err := strconv.Atoi(strings.Replace(splited[0], ",", "", -1))
 			if err == nil {
 				response.rangeStar[i] = star
 			}
@@ -91,46 +92,19 @@ func ParseGitHub(rt RangeType.RangeType, lang string) GitHubResponse {
 	return response
 }
 
-func PrintGitHub(response GitHubResponse, isJSONFormat bool) {
-	if isJSONFormat {
-		fmt.Println("[")
-		for i := 0; i < response.length; i++ {
-			fmt.Println("{")
-			fmt.Printf("  developer: %s,\n", "\""+response.developers[i]+"\"")
-			fmt.Printf("  name: %s,\n", "\""+response.names[i]+"\"")
-			fmt.Printf("  url: %s,\n", "\""+Definition.GithubURL+response.URLs[i]+"\"")
-			fmt.Printf("  description: %s,\n", "\""+response.descriptions[i]+"\"")
-			fmt.Printf("  language: %s,\n", "\""+response.languages[i]+"\"")
-			fmt.Printf("  sumStars: %d,\n", response.stars[i])
-			fmt.Printf("  forks: %d,\n", response.forks[i])
-			fmt.Printf("  ranged: {\n")
-			fmt.Printf("    type: %s,\n", "\""+response.rangeType.QueryString()+"\"")
-			fmt.Printf("    stars: %d\n", response.rangeStar[i])
-			fmt.Printf("  }\n")
-			fmt.Print("}")
-			if i < response.length-1 {
-				fmt.Print(",\n")
-			} else {
-				fmt.Println()
-			}
-		}
-		fmt.Println("]")
+func makeURL(path []string, parameter []string) string {
+	pathString := strings.Join(filter(path, func(str string) bool { return str != "" }), "/")
+	parameterString := strings.Join(filter(parameter, func(str string) bool { return str != "" }), "&")
+	return strings.Join([]string{pathString, parameterString}, "?")
+}
 
-	} else {
-		fmt.Printf("========== GitHub Trending ==========\n\n")
-		for i := 0; i < response.length; i++ {
-			fmt.Println("★-----★-----★-----★-----★-----★-----★-----★-----★-----★-----★")
-			fmt.Printf("  [rank] %d\n", i+1)
-			fmt.Printf("  [developer] %s\n", response.developers[i])
-			fmt.Printf("  [name] %s\n", response.names[i])
-			fmt.Printf("  [url] %s\n", Definition.GithubURL+response.URLs[i])
-			fmt.Printf("  [description] %s\n", response.descriptions[i])
-			fmt.Printf("  [language] %s\n", response.languages[i])
-			fmt.Printf("  [sumStars] %d\n", response.stars[i])
-			fmt.Printf("  [forks] %d\n", response.forks[i])
-			// TODO: -d -m などで複数のrangeを投げると、最初のリクエストしか取得できていない
-			fmt.Printf("  [trend] %d stars %s\n", response.rangeStar[i], response.rangeType.QueryString())
-			fmt.Println()
+func filter(target []string, isIncluded func(str string) bool) []string {
+	var ret []string
+	for _, e := range target {
+		if isIncluded(e) {
+			ret = append(ret, e)
 		}
 	}
+
+	return ret
 }
