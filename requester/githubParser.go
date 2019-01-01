@@ -1,7 +1,6 @@
 package requester
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -79,7 +78,6 @@ func parse(doc *goquery.Document, rt RangeType) GitHubResponse {
 	divf6.Each(func(i int, s *goquery.Selection) {
 		ns := s.Find("span.d-inline-block.float-sm-right")
 		text := strings.TrimSpace(ns.Text())
-		fmt.Println(text)
 		if text == "" {
 			response.rangeStar[i] = 0
 		} else {
