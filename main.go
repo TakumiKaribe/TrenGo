@@ -9,7 +9,6 @@ import (
 
 var (
 	lang string
-	d    bool
 	w    bool
 	m    bool
 	j    bool
@@ -18,7 +17,6 @@ var (
 
 func main() {
 	flag.StringVar(&lang, "l", "", "language name")
-	flag.BoolVar(&d, "d", false, "daily search")
 	flag.BoolVar(&w, "w", false, "weekly search")
 	flag.BoolVar(&m, "m", false, "monthly search")
 	flag.BoolVar(&g, "g", true, "GitHub search")
@@ -29,10 +27,7 @@ func main() {
 
 	var githubResponse requester.GitHubResponse
 	if g {
-		var rangeType requester.RangeType
-		if d {
-			rangeType = requester.Daily
-		}
+		rangeType := requester.Daily
 		if w {
 			rangeType = requester.Weekly
 		}
@@ -50,15 +45,7 @@ func main() {
 }
 
 func checkSearchRange() {
-	rangeTypes := []bool{d, w, m}
-	cnt := 0
-	for _, e := range rangeTypes {
-		if e {
-			cnt++
-		}
-	}
-
-	if cnt > 1 {
+	if w && m {
 		log.Fatalf("too many parameters.")
 	}
 }
