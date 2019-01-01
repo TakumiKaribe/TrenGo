@@ -94,8 +94,8 @@ func parseGitHub() {
 	length = divf6.Length()
 }
 
-func printGitHub(json bool) {
-	if json {
+func printGitHub(isJSONFormat bool) {
+	if isJSONFormat {
 		fmt.Println("[")
 		for i := 0; i < length; i++ {
 			fmt.Println("{")

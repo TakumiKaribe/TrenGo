@@ -1,5 +1,8 @@
 package main
 
+const githubURL string = "https://github.com"
+const trending string = "/trending"
+
 type RangeType int
 
 const (
