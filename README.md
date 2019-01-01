@@ -1,5 +1,7 @@
 # trengo
 
+[![CircleCI](https://circleci.com/gh/maka-nai/trengo/tree/master.svg?style=svg)](https://circleci.com/gh/maka-nai/trengo/tree/master)
+
 trengo gets repositories that are currently in trending in the world.
 
 It can be acquired according to language and period.ge
@@ -17,4 +19,5 @@ It can be acquired according to language and period.ge
 | -g | search target is GitHub ※2 | `true` |
 
 ※1 Search period arguments is exclusive. (none is daily)
+
 ※2 You must not `-g=false` because I have implemented only GitHub yet.
