@@ -32,6 +32,10 @@ func ParseGitHub(rt RangeType, lang string) GitHubResponse {
 		log.Fatal(err)
 	}
 
+	return parse(doc, rt)
+}
+
+func parse(doc *goquery.Document, rt RangeType) GitHubResponse {
 	var response = GitHubResponse{}
 	response.rangeType = rt
 

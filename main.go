@@ -41,7 +41,11 @@ func main() {
 		}
 
 		githubResponse = requester.ParseGitHub(rangeType, lang)
-		githubResponse.Print(j)
+		if j {
+			githubResponse.JSONPrint()
+		} else {
+			githubResponse.CLIPrint()
+		}
 	}
 }
 

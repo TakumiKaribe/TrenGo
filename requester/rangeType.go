@@ -17,7 +17,7 @@ func (rt RangeType) QueryString() string {
 	case Monthly:
 		return "monthly"
 	default:
-		return "unknown"
+		return ""
 	}
 }
 
