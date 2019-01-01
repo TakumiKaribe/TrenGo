@@ -2,6 +2,9 @@ package main
 
 import (
 	"flag"
+
+	"github.com/maka-nai/trengo/GitHubParser"
+	"github.com/maka-nai/trengo/RangeType"
 )
 
 func main() {
@@ -14,7 +17,7 @@ func main() {
 		g    bool
 	)
 	flag.StringVar(&lang, "l", "", "language name")
-	flag.BoolVar(&d, "d", false, "daily search")
+	flag.BoolVar(&d, "d", true, "daily search")
 	flag.BoolVar(&w, "w", false, "weekly search")
 	flag.BoolVar(&m, "m", false, "monthly search")
 	flag.BoolVar(&g, "g", true, "GitHub search")
@@ -22,14 +25,20 @@ func main() {
 
 	flag.Parse()
 
-	if lang != "" {
-		lang = "/" + lang
-	}
-
-	rangeType = parseRangeType(d, w, m)
-
+	var githubResponses []GitHubParser.GitHubResponse
 	if g {
-		parseGitHub()
-		printGitHub(j)
+		if d {
+			githubResponses = append(githubResponses, GitHubParser.ParseGitHub(RangeType.Daily, lang))
+		}
+		if w {
+			githubResponses = append(githubResponses, GitHubParser.ParseGitHub(RangeType.Weekly, lang))
+		}
+		if m {
+			githubResponses = append(githubResponses, GitHubParser.ParseGitHub(RangeType.Monthly, lang))
+		}
+
+		for _, r := range githubResponses {
+			GitHubParser.PrintGitHub(r, j)
+		}
 	}
 }

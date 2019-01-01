@@ -1,4 +1,4 @@
-package main
+package GitHubParser
 
 import (
 	"fmt"
@@ -8,24 +8,16 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/maka-nai/trengo/Definition"
+	"github.com/maka-nai/trengo/RangeType"
 )
 
-var lang string
-var rangeType RangeType
-
-var developers [50]string
-var names [50]string
-var URLs [50]string
-var descriptions [50]string
-var languages [50]string
-var stars [50]int
-var forks [50]int
-var rangeStar [50]int
-var length int
-
-func parseGitHub() {
+func ParseGitHub(rt RangeType.RangeType, lang string) GitHubResponse {
+	if lang != "" {
+		lang = "/" + lang
+	}
 	// Request the HTML page.
-	res, err := http.Get(githubURL + trending + lang + "?since=" + rangeType.QueryString())
+	res, err := http.Get(Definition.GithubURL + Definition.Trending + lang + "?since=" + rt.QueryString())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,17 +32,20 @@ func parseGitHub() {
 		log.Fatal(err)
 	}
 
+	var response = GitHubResponse{}
+	response.rangeType = rt
+
 	trends := doc.Find("body > div.application-main > div.explore-pjax-container.container-lg.p-responsive.clearfix > div > div.col-md-9.float-md-left > div.explore-content > ol")
 
 	trends.Each(func(i int, s *goquery.Selection) {
 		s.Find("div.d-inline-block.col-9.mb-1 > h3 > a").Each(func(i int, s *goquery.Selection) {
 			text := strings.Split(strings.Replace(s.Text(), " ", "", -1), "/")
-			developers[i] = strings.TrimSpace(text[0])
-			names[i] = strings.TrimSpace(text[1])
-			URLs[i] = strings.TrimSpace(s.AttrOr("href", "default"))
+			response.developers[i] = strings.TrimSpace(text[0])
+			response.names[i] = strings.TrimSpace(text[1])
+			response.URLs[i] = strings.TrimSpace(s.AttrOr("href", "default"))
 		})
 		s.Find("div.py-1").Each(func(i int, s *goquery.Selection) {
-			descriptions[i] = strings.TrimSpace(s.Text())
+			response.descriptions[i] = strings.TrimSpace(s.Text())
 		})
 	})
 
@@ -60,18 +55,18 @@ func parseGitHub() {
 			text := strings.TrimSpace(ns.Text())
 			attr := strings.TrimSpace(ns.Children().AttrOr("class", "default"))
 			if attr == "repo-language-color ml-0" && text != "" {
-				languages[i] = text
+				response.languages[i] = text
 			} else if attr == "octicon octicon-star" && text != "" {
 				if strings.TrimSpace(ns.Children().AttrOr("aria-label", "default")) == "star" {
 					v, err := strconv.Atoi(strings.Replace(text, ",", "", -1))
 					if err == nil {
-						stars[i] = v
+						response.stars[i] = v
 					}
 				}
 			} else if attr == "octicon octicon-repo-forked" && text != "" {
 				v, err := strconv.Atoi(strings.Replace(text, ",", "", -1))
 				if err == nil {
-					forks[i] = v
+					response.forks[i] = v
 				}
 			}
 		})
@@ -81,37 +76,39 @@ func parseGitHub() {
 		ns := s.Find("span.d-inline-block.float-sm-right")
 		text := strings.TrimSpace(ns.Text())
 		if text == "" {
-			rangeStar[i] = 0
+			response.rangeStar[i] = 0
 		} else {
 			splited := strings.Split(text, " ")
 			star, err := strconv.Atoi(splited[0])
 			if err == nil {
-				rangeStar[i] = star
+				response.rangeStar[i] = star
 			}
 		}
 	})
 
-	length = divf6.Length()
+	response.length = divf6.Length()
+
+	return response
 }
 
-func printGitHub(isJSONFormat bool) {
+func PrintGitHub(response GitHubResponse, isJSONFormat bool) {
 	if isJSONFormat {
 		fmt.Println("[")
-		for i := 0; i < length; i++ {
+		for i := 0; i < response.length; i++ {
 			fmt.Println("{")
-			fmt.Printf("  developer: %s,\n", "\""+developers[i]+"\"")
-			fmt.Printf("  name: %s,\n", "\""+names[i]+"\"")
-			fmt.Printf("  url: %s,\n", "\""+githubURL+URLs[i]+"\"")
-			fmt.Printf("  description: %s,\n", "\""+descriptions[i]+"\"")
-			fmt.Printf("  language: %s,\n", "\""+languages[i]+"\"")
-			fmt.Printf("  sumStars: %d,\n", stars[i])
-			fmt.Printf("  forks: %d,\n", forks[i])
+			fmt.Printf("  developer: %s,\n", "\""+response.developers[i]+"\"")
+			fmt.Printf("  name: %s,\n", "\""+response.names[i]+"\"")
+			fmt.Printf("  url: %s,\n", "\""+Definition.GithubURL+response.URLs[i]+"\"")
+			fmt.Printf("  description: %s,\n", "\""+response.descriptions[i]+"\"")
+			fmt.Printf("  language: %s,\n", "\""+response.languages[i]+"\"")
+			fmt.Printf("  sumStars: %d,\n", response.stars[i])
+			fmt.Printf("  forks: %d,\n", response.forks[i])
 			fmt.Printf("  ranged: {\n")
-			fmt.Printf("    type: %s,\n", "\""+rangeType.QueryString()+"\"")
-			fmt.Printf("    stars: %d\n", rangeStar[i])
+			fmt.Printf("    type: %s,\n", "\""+response.rangeType.QueryString()+"\"")
+			fmt.Printf("    stars: %d\n", response.rangeStar[i])
 			fmt.Printf("  }\n")
 			fmt.Print("}")
-			if i < length-1 {
+			if i < response.length-1 {
 				fmt.Print(",\n")
 			} else {
 				fmt.Println()
@@ -121,17 +118,18 @@ func printGitHub(isJSONFormat bool) {
 
 	} else {
 		fmt.Printf("========== GitHub Trending ==========\n\n")
-		for i := 0; i < length; i++ {
+		for i := 0; i < response.length; i++ {
 			fmt.Println("★-----★-----★-----★-----★-----★-----★-----★-----★-----★-----★")
 			fmt.Printf("  [rank] %d\n", i+1)
-			fmt.Printf("  [developer] %s\n", developers[i])
-			fmt.Printf("  [name] %s\n", names[i])
-			fmt.Printf("  [url] %s\n", githubURL+URLs[i])
-			fmt.Printf("  [description] %s\n", descriptions[i])
-			fmt.Printf("  [language] %s\n", languages[i])
-			fmt.Printf("  [sumStars] %d\n", stars[i])
-			fmt.Printf("  [forks] %d\n", forks[i])
-			fmt.Printf("  [trend] %d stars %s\n", rangeStar[i], rangeType.QueryString())
+			fmt.Printf("  [developer] %s\n", response.developers[i])
+			fmt.Printf("  [name] %s\n", response.names[i])
+			fmt.Printf("  [url] %s\n", Definition.GithubURL+response.URLs[i])
+			fmt.Printf("  [description] %s\n", response.descriptions[i])
+			fmt.Printf("  [language] %s\n", response.languages[i])
+			fmt.Printf("  [sumStars] %d\n", response.stars[i])
+			fmt.Printf("  [forks] %d\n", response.forks[i])
+			// TODO: -d -m などで複数のrangeを投げると、最初のリクエストしか取得できていない
+			fmt.Printf("  [trend] %d stars %s\n", response.rangeStar[i], response.rangeType.QueryString())
 			fmt.Println()
 		}
 	}
