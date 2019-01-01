@@ -4,7 +4,7 @@
 
 trengo gets repositories that are currently in trending in the world.
 
-It can be acquired according to language and period.ge
+It can be acquired according to language and period.
 
 ---
 
