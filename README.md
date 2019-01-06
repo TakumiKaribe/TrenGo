@@ -8,7 +8,7 @@ It can be acquired according to language and period.
 
 ---
 
-# Usage
+### Usage
 
 | Option | Description | Default Value |
 ----|----|----
@@ -24,6 +24,6 @@ It can be acquired according to language and period.
 
 ---
 
-# Demo
+### Demo
 
 ![demo](https://raw.github.com/wiki/maka-nai/trengo/images/usage.gif)
