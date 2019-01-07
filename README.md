@@ -21,9 +21,3 @@ It can be acquired according to language and period.
 ※1 Search period arguments is exclusive. (none is daily)
 
 ※2 You must not `-g=false` because I have implemented only GitHub yet.
-
----
-
-### Demo
-
-![demo](https://raw.github.com/wiki/maka-nai/trengo/images/usage.gif)
