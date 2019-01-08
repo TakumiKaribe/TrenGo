@@ -12,8 +12,14 @@ type GitHubResponse struct {
 	languages    [50]string
 	stars        [50]int
 	forks        [50]int
+	builtBy      [5]BuiltBy
 	rangeStar    [50]int
 	length       int
+}
+
+type BuiltBy struct {
+	name string
+	url  string
 }
 
 func (r *GitHubResponse) JSONPrint() {

@@ -71,6 +71,10 @@ func parse(doc *goquery.Document, rt RangeType) GitHubResponse {
 				if err == nil {
 					response.forks[i] = v
 				}
+			} else {
+				ns.Children().Each(func(k int, nss *goquery.Selection) {
+					// 「buit by」の各要素が入ってくる
+				})
 			}
 		})
 	})
