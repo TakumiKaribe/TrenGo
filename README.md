@@ -1,6 +1,6 @@
 # trengo
 
-[![CircleCI](https://circleci.com/gh/maka-nai/trengo/tree/master.svg?style=svg)](https://circleci.com/gh/maka-nai/trengo/tree/master)
+[![CircleCI](https://circleci.com/gh/TakumiKaribe/TrenGo.svg?style=svg)](https://circleci.com/gh/TakumiKaribe/TrenGo)
 
 trengo gets repositories that are currently in trending in the world.
 
