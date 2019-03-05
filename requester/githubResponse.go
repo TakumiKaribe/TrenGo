@@ -12,7 +12,7 @@ type GitHubResponse struct {
 	languages    [50]string
 	stars        [50]int
 	forks        [50]int
-	builtBy      [5]BuiltBy
+	builtBy      [50][5]BuiltBy
 	rangeStar    [50]int
 	length       int
 }

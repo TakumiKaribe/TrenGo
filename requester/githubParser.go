@@ -38,7 +38,7 @@ func parse(doc *goquery.Document, rt RangeType) GitHubResponse {
 	var response = GitHubResponse{}
 	response.rangeType = rt
 
-	trends := doc.Find("body > div.application-main > div.explore-pjax-container.container-lg.p-responsive.clearfix > div > div.col-md-9.float-md-left > div.explore-content > ol")
+	trends := doc.Find("body > div.application-main > main > div.explore-pjax-container.container-lg.p-responsive.clearfix > div > div.col-md-9.float-md-left > div.explore-content > ol")
 
 	trends.Each(func(i int, s *goquery.Selection) {
 		s.Find("div.d-inline-block.col-9.mb-1 > h3 > a").Each(func(i int, s *goquery.Selection) {
@@ -73,12 +73,15 @@ func parse(doc *goquery.Document, rt RangeType) GitHubResponse {
 				}
 			} else {
 				ns.Children().Each(func(k int, nss *goquery.Selection) {
-					// 「buit by」の各要素が入ってくる
+					builtByName := strings.TrimSpace(nss.AttrOr("href", "default"))
+					builtBy := BuiltBy{name: builtByName[1:], url: githubURL + builtByName}
+					response.builtBy[i][k] = builtBy
 				})
 			}
 		})
 	})
 
+	// parse today stars
 	divf6.Each(func(i int, s *goquery.Selection) {
 		ns := s.Find("span.d-inline-block.float-sm-right")
 		text := strings.TrimSpace(ns.Text())
