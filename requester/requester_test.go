@@ -10,7 +10,7 @@ import (
 
 func TestMakeURL(t *testing.T) {
 	expected := "https://github.com/trending/go?since=daily"
-	url := makeURL([]string{constants.GitHubURL, trending, "go"}, []string{"since=" + Daily.QueryString()})
+	url := makeURL([]string{constants.GitHubURL, trending, "go"}, []string{"since=" + queryTypeString(condition.Daily)})
 	if expected != url {
 		t.Errorf("makeURL not %s, got= %s", expected, url)
 	}
