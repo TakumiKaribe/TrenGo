@@ -12,12 +12,14 @@ var (
 	w    bool
 	m    bool
 	g    bool
+	n    int
 )
 
 func main() {
 	flag.StringVar(&lang, "l", "", "language name")
 	flag.BoolVar(&w, "w", false, "weekly search")
 	flag.BoolVar(&m, "m", false, "monthly search")
+	flag.IntVar(&n, "n", 10, "num print")
 
 	flag.Parse()
 	if w && m {
@@ -34,5 +36,5 @@ func main() {
 	}
 
 	githubResponse = requester.ParseGitHub(rangeType, lang)
-	githubResponse.CLIPrint()
+	githubResponse.CLIPrint(n)
 }

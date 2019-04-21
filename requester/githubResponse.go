@@ -22,9 +22,16 @@ type BuiltBy struct {
 	url  string
 }
 
-func (r *GitHubResponse) CLIPrint() {
+func (r *GitHubResponse) CLIPrint(n int) {
 	fmt.Printf("========== GitHub Trending ==========\n\n")
-	for i := 0; i < r.length; i++ {
+	count := func() int {
+		if n < r.length {
+			return n
+		} else {
+			return r.length
+		}
+	}
+	for i := 0; i < count(); i++ {
 		fmt.Println("★-----★-----★-----★-----★-----★-----★-----★-----★-----★-----★")
 		fmt.Printf("  [rank] %d\n", i+1)
 		fmt.Printf("  [developer] %s\n", r.developers[i])
