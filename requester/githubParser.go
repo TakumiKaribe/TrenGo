@@ -74,8 +74,14 @@ func parse(doc *goquery.Document, rt RangeType) GitHubResponse {
 			} else {
 				ns.Children().Each(func(k int, nss *goquery.Selection) {
 					builtByName := strings.TrimSpace(nss.AttrOr("href", "default"))
-					builtBy := BuiltBy{name: builtByName[1:], url: githubURL + builtByName}
-					response.builtBy[i][k] = builtBy
+					builtBy := struct {
+						name string
+						url  string
+					}{
+						builtByName[1:],
+						githubURL + builtByName,
+					}
+					response.builtBy[i] = append(response.builtBy[i], builtBy)
 				})
 			}
 		})

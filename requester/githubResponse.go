@@ -1,6 +1,8 @@
 package requester
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type GitHubResponse struct {
 	lang         string
@@ -12,14 +14,12 @@ type GitHubResponse struct {
 	languages    [50]string
 	stars        [50]int
 	forks        [50]int
-	builtBy      [50][5]BuiltBy
-	rangeStar    [50]int
-	length       int
-}
-
-type BuiltBy struct {
-	name string
-	url  string
+	builtBy      [50][]struct {
+		name string
+		url  string
+	}
+	rangeStar [50]int
+	length    int
 }
 
 func (r *GitHubResponse) CLIPrint(n int) {
@@ -42,9 +42,9 @@ func (r *GitHubResponse) CLIPrint(n int) {
 		fmt.Printf("  [sumStars] %d\n", r.stars[i])
 		fmt.Printf("  [forks] %d\n", r.forks[i])
 		fmt.Printf("  [builtBy]\n")
-		for j := 0; j < len(r.builtBy[i]); j++ {
-			fmt.Printf("    [name] %s\n", r.builtBy[i][j].name)
-			fmt.Printf("    [url] %s\n", r.builtBy[i][j].url)
+		for _, b := range r.builtBy[i] {
+			fmt.Printf("    [name] %s\n", b.name)
+			fmt.Printf("    [url] %s\n", b.url)
 		}
 		fmt.Printf("  [trend] %d stars %s\n", r.rangeStar[i], r.rangeType.QueryString())
 		fmt.Println()
