@@ -13,6 +13,7 @@ import (
 	"trengo/requester/condition"
 )
 
+// Parse -
 func Parse(body io.ReadCloser, rt condition.RangeType) model.Response {
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(body)
