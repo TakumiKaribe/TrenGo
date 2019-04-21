@@ -1,4 +1,4 @@
-package requester
+package condition
 
 type RangeType int
 
@@ -8,6 +8,7 @@ const (
 	Monthly
 )
 
+// QueryString -
 func (rt RangeType) QueryString() string {
 	switch rt {
 	case Daily:
@@ -21,6 +22,7 @@ func (rt RangeType) QueryString() string {
 	}
 }
 
+// DisplayString -
 func (rt RangeType) DisplayString() string {
 	switch rt {
 	case Daily:

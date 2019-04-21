@@ -4,7 +4,9 @@ import (
 	"flag"
 	"log"
 
+	"trengo/presenter"
 	"trengo/requester"
+	"trengo/requester/condition"
 )
 
 var (
@@ -26,15 +28,14 @@ func main() {
 		log.Fatalf("too many parameters.")
 	}
 
-	var githubResponse requester.GitHubResponse
-	rangeType := requester.Daily
+	rangeType := condition.Daily
 	if w {
-		rangeType = requester.Weekly
+		rangeType = condition.Weekly
 	}
 	if m {
-		rangeType = requester.Monthly
+		rangeType = condition.Monthly
 	}
 
-	githubResponse = requester.ParseGitHub(rangeType, lang)
-	githubResponse.CLIPrint(n)
+	response := requester.Request(rangeType, lang)
+	presenter.Print(response, rangeType, n)
 }
