@@ -15,7 +15,7 @@ const trending string = "trending"
 
 // Request -
 func Request(rt condition.RangeType, lang string) model.Response {
-	url := makeURL([]string{constants.GitHubURL, trending, lang}, []string{"since=" + rt.QueryString()})
+	url := makeURL([]string{constants.GitHubURL, trending, lang}, []string{"since=" + queryTypeString(rt)})
 
 	// Request the HTML page.
 	res, err := http.Get(url)
@@ -45,4 +45,17 @@ func filter(target []string, isIncluded func(str string) bool) []string {
 	}
 
 	return ret
+}
+
+func queryTypeString(rt condition.RangeType) string {
+	switch rt {
+	case condition.Daily:
+		return "daily"
+	case condition.Weekly:
+		return "weekly"
+	case condition.Monthly:
+		return "monthly"
+	default:
+		return ""
+	}
 }
