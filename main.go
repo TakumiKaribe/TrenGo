@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/TakumiKaribe/trengo/requester"
+	"trengo/requester"
 )
 
 var (
